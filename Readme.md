@@ -2,6 +2,9 @@
 
 해당 코드는 [monai](https://github.com/Project-MONAI/MONAI) 를 활용하여 medical image 를 ML 알고리즘으로 학습하고 추론하는 것을 SageMaker로 수행하는 예시입니다. 노트북 순서대로 진행하면 됩니다.
 
+- 원본 코드는 [여기](https://github.com/aws-samples/amazon-sagemaker-medical-imaging-with-monai/blob/main/Segmentation/MONAI_BYOS_spleen_segmentation_3D_Demo.ipynb) 를 참고하여 수정하였습니다.
+
+
 ### 01. 데이터 준비
 
 - 샘플 데이터셋을 다운로드 받고, local 환경에서 학습을 진행 해 봅니다.
