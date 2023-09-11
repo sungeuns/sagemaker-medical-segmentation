@@ -9,6 +9,12 @@
 
 - 샘플 데이터셋을 다운로드 받고, local 환경에서 학습을 진행 해 봅니다.
 - `code/local_train.py` 를 참고해 주세요. (실행 예시 : `code/run_local_train.sh`)
+
+```
+# 만일 matplot 관련 에러가 발생하는 경우
+$ pip install matplotlib --no-cache-dir --force-reinstall
+```
+
 - terminal 에서 아래 명령어를 활용하여 쉽게 EC2 서버처럼 사용할 수 있습니다.
 
 ```
