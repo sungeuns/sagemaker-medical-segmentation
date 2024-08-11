@@ -432,10 +432,11 @@ def evaluate(data_loader, model, device, log_writer, epoch, args, epoch_end=Fals
                 index_to_take = 0
 
                 figure_to_add = plot_results(args, [images[index_to_take], im_masked[index_to_take], y[index_to_take], im_paste[index_to_take]], loss_per_patch[index_to_take])
-
-                log_writer.add_figure(f'val/Example_{str(i)}_{swa_text}Results',
-                                    figure_to_add,
-                                    global_step=epoch)
+                
+                if log_writer is not None:
+                    log_writer.add_figure(f'val/Example_{str(i)}_{swa_text}Results',
+                                        figure_to_add,
+                                        global_step=epoch)
                 
                 # wandb logging
                 if (args.use_wandb):
@@ -450,10 +451,11 @@ def evaluate(data_loader, model, device, log_writer, epoch, args, epoch_end=Fals
                 metric_logger.update(loss_swa=loss.item())
 
         # plot embeddings with tensorboard
-        log_writer.add_embedding(torch.cat(embeddings, dim=0),
-                                label_img=torch.cat(imgs_to_plot, dim=0),
-                                global_step=epoch,
-                                tag=f"{swa_text}Embedding_Visualization")
+        if log_writer is not None:
+            log_writer.add_embedding(torch.cat(embeddings, dim=0),
+                                    label_img=torch.cat(imgs_to_plot, dim=0),
+                                    global_step=epoch,
+                                    tag=f"{swa_text}Embedding_Visualization")
 
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()

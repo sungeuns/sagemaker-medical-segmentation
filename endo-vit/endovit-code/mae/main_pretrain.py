@@ -57,6 +57,10 @@ import math
 # Allows us to create subsets of ImageFolder datasets
 from torch.utils.data import Subset
 
+
+from torch.distributed.elastic.multiprocessing.errors import record
+
+
 # Subdataset selection
 def trim_dataset(dataset, args, is_train=True):
     possible_subfolders = dataset.class_to_idx.keys()
@@ -351,7 +355,7 @@ def get_args_parser():
 
     return parser
 
-
+@record
 def main(args):
     misc.init_distributed_mode(args)
 
@@ -426,6 +430,7 @@ def main(args):
     if True:
         num_tasks = misc.get_world_size()
         global_rank = misc.get_rank()
+        print(f"Global RANK value: {global_rank}")
         sampler_train = torch.utils.data.DistributedSampler(
             dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True
         )
@@ -619,6 +624,7 @@ def main(args):
 
         if args.distributed:
             data_loader_train.sampler.set_epoch(epoch)
+            
         train_stats, val_stats = train_and_validate_one_epoch(
             model, model_without_ddp, data_loader_train, data_loader_val,
             optimizer, device, epoch, loss_scaler,
@@ -632,7 +638,7 @@ def main(args):
 
         # Moved this from before the train_and_validate_one_epoch to after. Now epoch % 5 == 0 instead of previously epoch % 5 == 1.
         # By resetting the loss every 5 epochs the best model will be saved in each of the intervals [epoch 0, epoch 1>, [epoch 1, epoch 5], [epoch 6, epoch 10] and so on
-        if epoch % 5 == 0 or epoch + 1 == args.epochs:
+        if (epoch % 5 == 0 or epoch + 1 == args.epochs) and misc.is_main_process():
             src = args.output_dir + '/' + 'best.pth'
             out_name = f'best_ckpt_{best_result["epoch"]}_loss_{best_result["loss"]:.4f}.pth'
             dest = args.output_dir + '/' + out_name
