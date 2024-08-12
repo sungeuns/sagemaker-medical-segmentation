@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #SBATCH --job-name=pretraining_for_Segmentation
 #SBATCH --output=./pretraining/pretrained_endovit_models/EndoViT_for_Segmentation/output/out.txt # Standard output of the script (Can be absolute or relative path). %A adds the job id to the file name so you can launch the same script multiple times and get different logging files
 #SBATCH --error=./pretraining/pretrained_endovit_models/EndoViT_for_Segmentation/output/err.txt
@@ -37,17 +37,40 @@ fi
 DATA_DIR=/opt/ml/input/data/training/
 CONFIG_PATH=./pretraining_config_sm.yml
 
-# if you don't want to use wandb remove the last 2 arguments below
-# NOTE: before using wandb you will have to log into wandb
-python ./mae/main_pretrain.py \
-    --config ${CONFIG_PATH} \
-    --data_path ${DATA_DIR} \
-    --val_data_path ${DATA_DIR} \
-    --train_datasets_to_take train \
-    --val_datasets_to_take validation \
-    --output_dir ${OUT_DIR} \
-    --log_dir ${OUT_DIR}/tensorboard_logs \
+
+declare -a OPTS=(
+    --config ${CONFIG_PATH}
+    --data_path ${DATA_DIR}
+    --val_data_path ${DATA_DIR}
+    --train_datasets_to_take train
+    --val_datasets_to_take validation
+    --output_dir ${OUT_DIR}
+    --log_dir ${OUT_DIR}/tensorboard_logs
     --save_best_model_at ${SAVE_BEST_MODEL_AT}
-#    1>${OUT_DIR}/out.txt 2>${OUT_DIR}/err.txt   
-#    --use_wandb \
-#    --wandb_run_name ${WANDB_RUN_NAME} \
+)
+
+
+if [ $SM_NUM_GPUS -eq 1 ]
+then
+    echo python ./mae/main_pretrain.py "${OPTS[@]}" "$@"
+    CUDA_VISIBLE_DEVICES=0 python ./mae/main_pretrain.py "${OPTS[@]}" "$@"
+else
+    echo torchrun --nnodes 1 --nproc_per_node "$SM_NUM_GPUS" ./mae/main_pretrain.py "${OPTS[@]}" "$@"
+    torchrun --nnodes 1 --nproc_per_node "$SM_NUM_GPUS" ./mae/main_pretrain.py "${OPTS[@]}" "$@"
+fi
+
+
+# # if you don't want to use wandb remove the last 2 arguments below
+# # NOTE: before using wandb you will have to log into wandb
+# python ./mae/main_pretrain.py \
+#     --config ${CONFIG_PATH} \
+#     --data_path ${DATA_DIR} \
+#     --val_data_path ${DATA_DIR} \
+#     --train_datasets_to_take train \
+#     --val_datasets_to_take validation \
+#     --output_dir ${OUT_DIR} \
+#     --log_dir ${OUT_DIR}/tensorboard_logs \
+#     --save_best_model_at ${SAVE_BEST_MODEL_AT}
+# #    1>${OUT_DIR}/out.txt 2>${OUT_DIR}/err.txt
+# #    --use_wandb \
+# #    --wandb_run_name ${WANDB_RUN_NAME} \

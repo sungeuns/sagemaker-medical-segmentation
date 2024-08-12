@@ -48,8 +48,5 @@ declare -a OPTS=(
     --save_best_model_at ${SAVE_BEST_MODEL_AT}
 )
 
-
-#OMP_NUM_THREADS=1
-
 echo torchrun --nproc_per_node="$NUM_GPUS" ./mae/main_pretrain.py "${OPTS[@]}" "$@"
 torchrun --nproc_per_node="$NUM_GPUS" ./mae/main_pretrain.py "${OPTS[@]}" "$@"
