@@ -5,11 +5,12 @@
 - EndoVit: https://github.com/DominikBatic/EndoViT
 
 
-워크샵 진행
+### 워크샵 진행
+
 - 01-prepare-sample-data.ipynb
-  - 아래 데이터 준비 및 모델 준비 과정을 직접 하지 않고 쉽게 진행할 수 있습니다.
+  - 아래 `데이터 준비` 및 `모델 준비` 과정을 직접 하지 않고 쉽게 진행하려면 해당 노트북의 cell 을 실행하면 됩니다.
 - 02-endovit-training-on-sagemaker.ipynb
-  - SageMaker의 managed training을 활용해 봅니다.
+  - 데이터 준비 후 SageMaker의 managed training을 사용하여 학습을 진행 해 봅니다.
 
 
 ### 데이터 준비
@@ -53,7 +54,16 @@ aws s3 cp mae_pretrain_vit_base_full.pth s3://[prefix]/
 
 ### 로컬 Training 테스트 진행
 
-원본 repo에 있는 패키지 리스트를 설치해도 되지만 시간이 오래 걸리기 때문에 아래 requirements.txt 를 사용해도 됩니다.
+로컬 테스트를 위한 환경을 구성합니다.
+
+```
+source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
+conda create --name endovit-sagemaker python=3.9
+conda activate endovit-sagemaker
+cd endobit-code; pip install -r requirements.txt
+```
+
+원본 repo에 있는 패키지 리스트를 설치해도 되지만 시간이 오래 걸리기 때문에 필요한 패키지만 설치합니다. `requirements.txt`에는 아래 패키지를 사용합니다.
 
 ```
 torch==1.13.0
@@ -67,17 +77,7 @@ torchmetrics==0.10.1
 matplotlib==3.6.1
 ```
 
-로컬 테스트를 위한 환경을 구성합니다.
-
-```
-source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
-conda create --name endovit-sagemaker python=3.9
-conda activate endovit-sagemaker
-cd endobit-code; pip install -r requirements.txt
-
-```
-
-training을 진행하기 전에 파라미터가 적합하게 들어갔는지 확인하고, 학습을 진행 해 봅니다.
+training을 진행하기 전에 파라미터가 적합하게 들어갔는지 확인하고, 학습을 진행합니다.
 
 ```
 ./pretrain_script_local.sh
@@ -89,13 +89,15 @@ training을 진행하기 전에 파라미터가 적합하게 들어갔는지 확
 ./pretrain_script_local_multigpu.sh
 ```
 
-
 ### SageMaker에서 학습 진행
 
 - `02-endovit-training-on-sagemaker.ipynb` 노트북을 실행해서 SageMaker training job을 테스트해 볼 수 있습니다.
 - SageMaker에서 실행되는 스크립트는 `pretrain_script_sm.sh` 파일을 참고합니다.
 - `instance_type` 에서 GPU가 1개인 instance를 사용하면 자동으로 단일 GPU 기반 학습이 진행되며 GPU가 여러 개인 instance를 사용하면 자동으로 Multi-GPU 기반 학습이 진행됩니다.
 
+
+
+---------
 
 
 ## 기존 코드 테스트
