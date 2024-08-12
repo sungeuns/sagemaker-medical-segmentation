@@ -83,6 +83,19 @@ training을 진행하기 전에 파라미터가 적합하게 들어갔는지 확
 ./pretrain_script_local.sh
 ```
 
+만일 Multi-GPU를 활용한 distributed training을 하려면 아래 스크립트로 가능합니다.
+
+```
+./pretrain_script_local_multigpu.sh
+```
+
+
+### SageMaker에서 학습 진행
+
+- `02-endovit-training-on-sagemaker.ipynb` 노트북을 실행해서 SageMaker training job을 테스트해 볼 수 있습니다.
+- SageMaker에서 실행되는 스크립트는 `pretrain_script_sm.sh` 파일을 참고합니다.
+- `instance_type` 에서 GPU가 1개인 instance를 사용하면 자동으로 단일 GPU 기반 학습이 진행되며 GPU가 여러 개인 instance를 사용하면 자동으로 Multi-GPU 기반 학습이 진행됩니다.
+
 
 
 ## 기존 코드 테스트
