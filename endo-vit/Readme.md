@@ -94,7 +94,35 @@ training을 진행하기 전에 파라미터가 적합하게 들어갔는지 확
 - `02-endovit-training-on-sagemaker.ipynb` 노트북을 실행해서 SageMaker training job을 테스트해 볼 수 있습니다.
 - SageMaker에서 실행되는 스크립트는 `pretrain_script_sm.sh` 파일을 참고합니다.
 - `instance_type` 에서 GPU가 1개인 instance를 사용하면 자동으로 단일 GPU 기반 학습이 진행되며 GPU가 여러 개인 instance를 사용하면 자동으로 Multi-GPU 기반 학습이 진행됩니다.
+- CloudWatch를 사용해서 로그를 확인할 수도 있고, tensorboard, wandb 등을 활용할 수도 있습니다.
 
+### Tensorboard 활용 시
+
+아래는 s3에 적재되는 log 파일을 가져오는 예시 코드입니다. 
+
+```
+train_job_name = "endo-vit-seg-pt-xxxx"
+tensorboard_log_uri = "s3://sagemaker-us-west-2-xxxxxxxx/workshop/endo-vit/endo-vit-seg-pt/checkpoints/endovit_sagemaker_xxxxxx/tensorboard_logs/"
+
+import time
+import subprocess
+from datetime import datetime
+
+while True:
+    print(f"Sync started: {datetime.now()}")
+    subprocess.run(['aws', 's3', 'sync', tensorboard_log_uri, train_job_name])
+    print(f"Sync ended: {datetime.now()}")
+    time.sleep(60)
+```
+
+tensorboard를 실행할 수 있습니다.
+
+```
+tensorboard --logdir=./endo-vit-seg-pt-xxxx
+
+# 접속
+https://[notebook_id].notebook.us-west-2.sagemaker.aws/proxy/6006/
+```
 
 
 ---------
@@ -170,7 +198,4 @@ tensorboard --logdir [로그 경로]
 
 # 접속 주소
 https://[NOTEBOOK_NAME].notebook.[REGION].sagemaker.aws/proxy/6006/
-
-# 예시
-https://sm-notebook-g5.notebook.us-west-2.sagemaker.aws/proxy/6006/
 ```
