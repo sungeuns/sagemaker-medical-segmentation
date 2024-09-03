@@ -60,7 +60,7 @@ aws s3 cp mae_pretrain_vit_base_full.pth s3://[prefix]/
 source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
 conda create --name endovit-sagemaker python=3.9
 conda activate endovit-sagemaker
-cd endobit-code; pip install -r requirements.txt
+cd endovit-code; pip install -r requirements.txt
 ```
 
 원본 repo에 있는 패키지 리스트를 설치해도 되지만 시간이 오래 걸리기 때문에 필요한 패키지만 설치합니다. `requirements.txt`에는 아래 패키지를 사용합니다.
